@@ -1,5 +1,7 @@
 import Swal from 'sweetalert2'
 
+import {ActionBody, ActionName} from './types'
+
 async function showError(text: string) {
 	await Swal.fire({
 		text,
@@ -7,15 +9,15 @@ async function showError(text: string) {
 	})
 }
 
-export async function sendCommand(data: {action: string, vmName?: string, value?: number}, title: string): Promise<void> {
+export async function sendCommand<A extends ActionName>(action: ActionBody<A>): Promise<void> {
 	await Swal.fire({
-		title,
+		title: 'Apply changes...',
 		didOpen: () => {
 			Swal.showLoading()
 			fetch('/execute', {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(data),
+				body: JSON.stringify(action),
 			})
 				.then((response) => {
 					if (response.status !== 200) {
@@ -29,7 +31,7 @@ export async function sendCommand(data: {action: string, vmName?: string, value?
 }
 
 export function wakeHost(): Promise<void> {
-
+	return sendCommand({action: 'wakeHost'})
 }
 
 async function setVM(vmName: string, current: number, inputAttributes: Record<string, string | number>, propName: 'CPU' | 'RAM', text: string) {
@@ -41,11 +43,11 @@ async function setVM(vmName: string, current: number, inputAttributes: Record<st
 		inputAttributes: inputAttributes as Record<string, string>,
 		inputValue: current,
 		showLoaderOnConfirm: true,
-		preConfirm: (value) => sendCommand(
-			`set${propName}`,
+		preConfirm: (value) => sendCommand({
+			action: `set${propName}`,
 			vmName,
 			value,
-		),
+		}),
 	})
 }
 
