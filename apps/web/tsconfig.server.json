@@ -1,0 +1,11 @@
+{
+  "extends": "tsconfig/vite.server.json",
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/environment.d.ts"
+  ],
+  "include": ["src/*.ts"],
+  "exclude": ["node_modules", "src/client"]
+}

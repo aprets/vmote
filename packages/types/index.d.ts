@@ -26,17 +26,17 @@ type VMIdentification = {
 
 interface ActionsMap {
 	wakeHost: Record<string, unknown>,
-	update: Record<string, unknown>,
-	shutDownHost: Record<string, unknown>,
+	updateAgent: Record<string, unknown>,
+	shutdownHost: Record<string, unknown>,
 	suspendHost: Record<string, unknown>,
 	restartHost: Record<string, unknown>,
 	restartHostParsec: Record<string, unknown>,
-	start: VMIdentification,
-	stop: VMIdentification,
-	setCPU: VMIdentification & {
+	startVM: VMIdentification,
+	stopVM: VMIdentification,
+	setVMCPU: VMIdentification & {
 		value: number
 	},
-	setRAM: VMIdentification & {
+	setVMRAM: VMIdentification & {
 		value: number
 	},
 }

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Vite Server",
+  "extends": "./vite.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "commonjs",
+    "noEmit": false
+  },
+  "include": ["src/*.ts"],
+  "exclude": ["node_modules", "src/client"]
+}

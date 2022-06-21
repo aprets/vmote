@@ -1,1 +1,1 @@
-# vmote-web
+# VMote

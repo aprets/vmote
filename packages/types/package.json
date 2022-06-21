@@ -1,0 +1,14 @@
+{
+  "name": "types",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint *.ts*"
+  },
+  "devDependencies": {
+    "config": "*",
+    "eslint": "^8.18.0",
+    "tsconfig": "*",
+    "typescript": "^4.7.4"
+  }
+}

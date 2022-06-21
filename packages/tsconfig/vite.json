@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Vite",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "resolveJsonModule": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "types": ["vite/client", "node"],
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "isolatedModules": true
+  },
+  "include": ["./src/client"],
+  "exclude": ["node_modules"]
+}

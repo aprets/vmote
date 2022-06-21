@@ -1,0 +1,5 @@
+{
+  "extends": "tsconfig/vite.json",
+  "include": ["src/client"],
+  "exclude": ["node_modules"]
+}

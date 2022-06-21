@@ -44,14 +44,14 @@ async function setVM(vmName: string, current: number, inputAttributes: Record<st
 		inputValue: current,
 		showLoaderOnConfirm: true,
 		preConfirm: (value) => sendCommand({
-			action: `set${propName}`,
+			action: `setVM${propName}`,
 			vmName,
 			value,
 		}),
 	})
 }
 
-export function setCPU(vmName: string, current: number, max: number): Promise<void> {
+export function setVMCPU(vmName: string, current: number, max: number): Promise<void> {
 	return setVM(
 		vmName,
 		current,
@@ -65,7 +65,7 @@ export function setCPU(vmName: string, current: number, max: number): Promise<vo
 	)
 }
 
-export function setRAM(vmName: string, current: number, max: number): Promise<void> {
+export function setVMRAM(vmName: string, current: number, max: number): Promise<void> {
 	return setVM(
 		vmName,
 		current,

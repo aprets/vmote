@@ -7,7 +7,7 @@ import {Title, Text, Container, Card, RingProgress, SimpleGrid, Box, Group, Butt
 import {io, Socket} from 'socket.io-client'
 
 import {Status} from '../lib/types'
-import {setCPU, setRAM, sendCommand, wakeHost} from '../lib/remoteExec'
+import {setVMCPU, setVMRAM, sendCommand, wakeHost} from '../lib/remoteExec'
 import camelToTitle from '../lib/utils'
 
 function MetricRing({label, value}: {label: string, value: number}) {
@@ -66,6 +66,10 @@ export default function HomePage(): React.ReactElement {
 			setStatus(undefined)
 		})
 
+		socket.on('agentOffline', () => {
+			setStatus(undefined)
+		})
+
 		return () => { socket.close() }
 	}, [])
 
@@ -78,8 +82,8 @@ export default function HomePage(): React.ReactElement {
 
 	return (
 		<>
-			<Title sx={{fontSize: 30, fontWeight: 300, letterSpacing: -2}} align='center' mt={10}>
-				HyperNano
+			<Title sx={{fontSize: 30, fontWeight: 300}} align='center' mt={10}>
+				VMote
 				<Text inherit variant='gradient' component='span' sx={{verticalAlign: 'super', fontSize: 20, letterSpacing: 0}}>
 					Beta
 				</Text>
@@ -91,9 +95,11 @@ export default function HomePage(): React.ReactElement {
 					shadow='sm'
 					padding='xl'
 				>
-
 					<Text weight={500} size='xl' mb={10}>
-						Host ({connected ? <Text inherit color='green' component='span'>Online</Text> : <Text inherit color='red' component='span'>Offline</Text>})
+						Host (
+						{connected && status && <Text inherit color='green' component='span'>Running</Text>}
+						{(!connected || !status) && <Text inherit color='red' component='span'>Offline</Text>}
+						)
 					</Text>
 
 					{status && (
@@ -106,19 +112,19 @@ export default function HomePage(): React.ReactElement {
 								<MetricRing label='VRAM Usage' value={status.vramUsage} />
 							</SimpleGrid>
 							<Group position='left' spacing='xs' mt={10}>
-								<Button variant='light' color='red' onClick={() => { sendCommand('restartHostParsec') }}>
+								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'restartHostParsec'}) }}>
 									Restart Host Parsec
 								</Button>
-								<Button variant='light' color='red' onClick={() => { sendCommand('suspendHost') }}>
+								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'suspendHost'}) }}>
 									Suspend Host
 								</Button>
-								<Button variant='light' color='red' onClick={() => { sendCommand('restartHost') }}>
+								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'restartHost'}) }}>
 									Restart Host
 								</Button>
-								<Button variant='light' color='red' onClick={() => { sendCommand('shutdownHost') }}>
+								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'shutdownHost'}) }}>
 									Shutdown Host
 								</Button>
-								<Button variant='light' color='blue' onClick={() => { sendCommand('update') }}>
+								<Button variant='light' color='blue' onClick={() => { sendCommand({action: 'updateAgent'}) }}>
 									Update Repo
 								</Button>
 								<Button variant='light' color='grape' component='a' href={process.env.NEXT_PUBLIC_HOST_PARSEC_URL} target='_blank'>
@@ -132,7 +138,7 @@ export default function HomePage(): React.ReactElement {
 						<Skeleton height={200} />
 					)}
 
-					{!connected && (
+					{(!connected || !status) && (
 						<Group direction='column' align='center'>
 							<ActionIcon
 								size={100}
@@ -145,9 +151,11 @@ export default function HomePage(): React.ReactElement {
 					)}
 
 				</Card>
+
 				{connected && !status && (
 					<Skeleton height='100vh' mt={10} />
 				)}
+
 				{status && status.vms && (
 					<>
 						{status.vms.map((vm) => (
@@ -162,8 +170,8 @@ export default function HomePage(): React.ReactElement {
 								<Text weight={500} size='xl' mb={10}>
 									{vm.name}{' '}
 									(
-									<Text inherit variant='link' component='span' sx={{cursor: 'pointer'}} onClick={() => { setCPU(vm.name, vm.processorCount, status.cores) }}>{vm.processorCount}CPU</Text>,{' '}
-									<Text inherit variant='link' component='span' sx={{cursor: 'pointer'}} onClick={() => { setRAM(vm.name, vm.ram, status.totalRam) }}>{vm.ram}GB RAM</Text>
+									<Text inherit variant='link' component='span' sx={{cursor: 'pointer'}} onClick={() => { setVMCPU(vm.name, vm.processorCount, status.cores) }}>{vm.processorCount}CPU</Text>,{' '}
+									<Text inherit variant='link' component='span' sx={{cursor: 'pointer'}} onClick={() => { setVMRAM(vm.name, vm.ram, status.totalRam) }}>{vm.ram}GB RAM</Text>
 									)
 								</Text>
 
@@ -181,10 +189,10 @@ export default function HomePage(): React.ReactElement {
 								)}
 
 								<Group position='left' spacing='xs' mt={10}>
-									<Button variant='light' color='green' onClick={() => { sendCommand('start', vm.name) }}>
+									<Button variant='light' color='green' onClick={() => { sendCommand({action: 'startVM', vmName: vm.name}) }}>
 										Start
 									</Button>
-									<Button variant='light' color='red' onClick={() => { sendCommand('stop', vm.name) }}>
+									<Button variant='light' color='red' onClick={() => { sendCommand({action: 'stopVM', vmName: vm.name}) }}>
 										Stop
 									</Button>
 								</Group>
