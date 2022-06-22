@@ -34,7 +34,7 @@ export const hypervVMStates = [
 
 const WINDIR = process.env.WINDIR || 'C:\\Windows'
 
-export function updateNvidiaSmiPath() {
+export function getWindowsNvidiaSmiPath() {
 	// The MIT License (MIT)
 
 	// Copyright (c) 2014-2021 Sebastian Hildebrandt
@@ -55,7 +55,9 @@ export function updateNvidiaSmiPath() {
 	// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 	// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 	// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+	if (process.platform !== 'win32') {
+		return undefined
+	}
 	const basePath = `${WINDIR}\\System32\\DriverStore\\FileRepository`
 	// find all directories that have an nvidia-smi.exe file
 	const candidateDirs = fs.readdirSync(basePath).filter((dir) => fs.readdirSync([basePath, dir].join('\\')).includes('nvidia-smi.exe'))

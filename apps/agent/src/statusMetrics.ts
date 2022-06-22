@@ -4,18 +4,24 @@ import 'loadavg-windows'
 import humanizeDuration from 'humanize-duration'
 import {PowerShell} from 'node-powershell'
 
-import {hypervVMStates, updateNvidiaSmiPath} from './utils'
+import {hypervVMStates, getWindowsNvidiaSmiPath} from './utils'
 
-const nvidiaSmiPath = updateNvidiaSmiPath()
+const nvidiaSmiPath = getWindowsNvidiaSmiPath()
 
-const ps = new PowerShell({
-	executableOptions: {
-		'-ExecutionPolicy': 'Bypass',
-		'-NoProfile': true,
-	},
-})
+let ps: PowerShell
 
-ps.invoke('echo started')
+if (process.platform === 'win32') {
+	ps = new PowerShell({
+		executableOptions: {
+			'-ExecutionPolicy': 'Bypass',
+			'-NoProfile': true,
+		},
+	})
+	ps.invoke('echo started')
+} else {
+	// eslint-disable-next-line no-console
+	console.warn('WARNING Metrics can only be collected on Windows, using undefined instead')
+}
 
 async function runPS(psCommand: string) {
 	const result = await ps.invoke(psCommand)
@@ -31,6 +37,10 @@ const cores = os.cpus().length
 let currentPowerPlan: string
 
 export async function calculateStatus() {
+	if (process.platform !== 'win32') {
+		return undefined
+	}
+
 	const cpuUsage = Math.round((os.loadavg()[0] * 100) / cores)
 
 	const ramUsage = Math.round(100 - ((os.freemem() / os.totalmem()) * 100))
