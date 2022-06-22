@@ -1,6 +1,7 @@
-import Swal from 'sweetalert2'
+import type {ActionBody, ActionName} from 'types'
 
-import {ActionBody, ActionName} from './types'
+import 'sweetalert2/dist/sweetalert2.css'
+import Swal from 'sweetalert2'
 
 async function showError(text: string) {
 	await Swal.fire({
@@ -28,10 +29,6 @@ export async function sendCommand<A extends ActionName>(action: ActionBody<A>): 
 				.finally(() => { Swal.close() })
 		},
 	})
-}
-
-export function wakeHost(): Promise<void> {
-	return sendCommand({action: 'wakeHost'})
 }
 
 async function setVM(vmName: string, current: number, inputAttributes: Record<string, string | number>, propName: 'CPU' | 'RAM', text: string) {
