@@ -27,7 +27,7 @@ async function wakeHost(uuid: string) {
 	console.log(`waking up host ${process.env.HOST_ADDR}`)
 	let tries = 0
 	let alive = false
-	while (!alive && tries <= 15) {
+	while (!alive && tries <= 25) {
 		console.log(`try ${tries}`)
 		tries += 1
 		wol.wake(process.env.HOST_MAC_ADDR)
