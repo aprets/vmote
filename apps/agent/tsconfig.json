@@ -5,6 +5,13 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "include": ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.d.ts"],
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/environment.d.ts",
+    "src/auto-git-update.d.ts",
+  ],
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "exclude": ["dist"]
 }
