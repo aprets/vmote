@@ -11,9 +11,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '^/(execute|checkin)': {
+      '^/(execute|checkin|socket\.io)': {
         target: `http://localhost:${PORT}`,
         changeOrigin: true,
+        ws: true
       },
     },
   },
