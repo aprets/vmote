@@ -28,12 +28,14 @@ async function wakeHost(uuid: string) {
 	let tries = 0
 	let alive = false
 	while (!alive && tries <= 15) {
+		console.log(`try ${tries}`)
 		tries += 1
 		wol.wake(process.env.HOST_MAC_ADDR)
 		// eslint-disable-next-line no-await-in-loop
-		const r = await ping.promise.probe(process.env.HOST_ADDR, {timeout: 1000})
+		const r = await ping.promise.probe(process.env.HOST_ADDR)
 		alive = r.alive
 	}
+	console.dir({uuid, alive})
 	eventEmitter.emit(uuid, !alive)
 }
 
