@@ -1,52 +1,15 @@
-import type {Status} from 'types'
-
-import {useEffect, useRef, useState} from 'react'
-
 import {MdOutlinePowerSettingsNew} from 'react-icons/md'
 
-import {Title, Text, Container, Card, SimpleGrid, Group, Button, Skeleton, ActionIcon} from '@mantine/core'
+import {Title, Text, Container, Card, Group, Skeleton, ActionIcon} from '@mantine/core'
 
-import {io, Socket} from 'socket.io-client'
-
-import {setVMCPU, setVMRAM, sendCommand, wakeHost} from './lib/remoteExec'
-import camelToTitle from './lib/utils'
-import {MetricText, MetricRing} from './components/metrics'
+import {useStatus} from './lib/useStatus'
+import HostCard from './components/HostCard'
+import {VMCard} from './components/VMCard'
+import {sendCommand} from './lib/remoteExec'
 
 export default function Dashboard(): React.ReactElement {
-	const [connected, setConnected] = useState(false)
-	const [status, setStatus] = useState<Status>()
-	const socketRef = useRef<Socket>()
-
-	useEffect(() => {
-		const socket = io()
-		socketRef.current = socket
-
-		socket.on('connect', () => {
-			setConnected(true)
-		})
-
-		socket.on('status', (updatedStatus) => {
-			setStatus(updatedStatus)
-		})
-
-		socket.on('disconnect', () => {
-			setConnected(false)
-			setStatus(undefined)
-		})
-
-		socket.on('agentOffline', () => {
-			setStatus(undefined)
-		})
-
-		return () => { socket.close() }
-	}, [])
-
-	console.log(status)
-
-	const reconnectSocket = () => {
-		socketRef.current?.disconnect()
-		socketRef.current?.connect()
-	}
+	const [loading, status] = useStatus()
+	const connected = !loading
 
 	return (
 		<>
@@ -70,37 +33,7 @@ export default function Dashboard(): React.ReactElement {
 						)
 					</Text>
 
-					{status && (
-						<>
-							<SimpleGrid cols={5} spacing='xs'>
-								<MetricRing label='CPU Usage' value={status.cpuUsage} />
-								<MetricRing label='RAM Usage' value={status.ramUsage} />
-								<MetricText label='RAM Amount' value={`${status.activeRam} / ${status.totalRam} GB`} />
-								<MetricRing label='GPU Usage' value={status.gpuUsage} />
-								<MetricRing label='VRAM Usage' value={status.vramUsage} />
-							</SimpleGrid>
-							<Group position='left' spacing='xs' mt={10}>
-								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'restartHostParsec'}) }}>
-									Restart Host Parsec
-								</Button>
-								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'suspendHost'}) }}>
-									Suspend Host
-								</Button>
-								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'restartHost'}) }}>
-									Restart Host
-								</Button>
-								<Button variant='light' color='red' onClick={() => { sendCommand({action: 'shutdownHost'}) }}>
-									Shutdown Host
-								</Button>
-								<Button variant='light' color='blue' onClick={() => { sendCommand({action: 'updateAgent'}) }}>
-									Update Repo
-								</Button>
-								<Button variant='light' color='grape' component='a' href={process.env.NEXT_PUBLIC_HOST_PARSEC_URL} target='_blank'>
-									Open In Parsec
-								</Button>
-							</Group>
-						</>
-					)}
+					{status && <HostCard status={status} />}
 
 					{connected && !status && (
 						<Skeleton height={200} />
@@ -111,7 +44,7 @@ export default function Dashboard(): React.ReactElement {
 							<ActionIcon
 								size={100}
 								variant='transparent'
-								onClick={() => { wakeHost().then(reconnectSocket) }}
+								onClick={() => { sendCommand({action: 'wakeHost'}) }}
 							>
 								<MdOutlinePowerSettingsNew size='100px' color='#f03e3e' />
 							</ActionIcon>
@@ -134,39 +67,8 @@ export default function Dashboard(): React.ReactElement {
 								mt={10}
 								key={vm.id}
 							>
-
-								<Text weight={500} size='xl' mb={10}>
-									{vm.name}{' '}
-									(
-									<Text inherit variant='link' component='span' sx={{cursor: 'pointer'}} onClick={() => { setVMCPU(vm.name, vm.processorCount, status.cores) }}>{vm.processorCount}CPU</Text>,{' '}
-									<Text inherit variant='link' component='span' sx={{cursor: 'pointer'}} onClick={() => { setVMRAM(vm.name, vm.ram, status.totalRam) }}>{vm.ram}GB RAM</Text>
-									)
-								</Text>
-
-								{vm.state === 'Running' && (
-									<SimpleGrid cols={4} spacing='xs'>
-										<MetricRing label='CPU Usage' value={vm.cpuUsage} />
-										<MetricRing label='RAM Usage' value={vm.ramUsage} />
-										<MetricText label='RAM Amount' value={`${vm.activeRam} / ${vm.totalRam} GB`} />
-										<MetricText label='Uptime' value={vm.uptime} />
-									</SimpleGrid>
-								)}
-
-								{vm.state !== 'Running' && (
-									<Text color='red'>{camelToTitle(vm.state)}</Text>
-								)}
-
-								<Group position='left' spacing='xs' mt={10}>
-									<Button variant='light' color='green' onClick={() => { sendCommand({action: 'startVM', vmName: vm.name}) }}>
-										Start
-									</Button>
-									<Button variant='light' color='red' onClick={() => { sendCommand({action: 'stopVM', vmName: vm.name}) }}>
-										Stop
-									</Button>
-								</Group>
-
+								<VMCard status={status} vm={vm} />
 							</Card>
-
 						))}
 					</>
 				)}
