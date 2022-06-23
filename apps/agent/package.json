@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "ts-node-dev src/",
-    "build": "tsc",
     "start": "ts-node -P tsconfig.prod.json -T src/runner"
   },
   "dependencies": {
