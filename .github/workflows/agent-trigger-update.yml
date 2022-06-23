@@ -21,6 +21,10 @@ jobs:
         -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}"
         -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}"
         -H 'Content-Type: application/json'
-        -d '{"action": "updateAgent"}'
+        -d '{
+          "action": "updateAgent", 
+          "zipUrl": "https://github.com/gentleseal/vmote/archive/refs/heads/main.zip",
+          "zipPath": "vmote-main/apps/agent/"
+        }'
         https://vmote.wcore.net/execute
 
