@@ -66,3 +66,9 @@ export type AgentUnknownActionBody = ActionBody<AgentActionName>
 export type AgentActionHandlerMap = {
 	[k in AgentActionName]: (actionBody: ActionBody<k>) => Promise<void | string>
 }
+
+export interface CheckinRequestBody {
+	status: Status,
+	completedIds: string[],
+	errors: string[]
+}

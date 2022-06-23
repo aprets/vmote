@@ -1,4 +1,4 @@
-import type {AgentActionHandlerMap, AgentUnknownActionBody} from 'types'
+import type {AgentActionHandlerMap, AgentUnknownActionBody, CheckinRequestBody} from 'types'
 
 import dotenv from 'dotenv'
 
@@ -15,8 +15,8 @@ dotenv.config({path: '.env.local'})
 
 const runOneOffPowerShell = (command: string) => PowerShell.invoke(command, {executableOptions: {'-ExecutionPolicy': 'Bypass', '-NoProfile': true}})
 
-let completedActions: string[] = []
-let failedActions: string[] = []
+let completedIds: string[] = []
+let errors: string[] = []
 
 const actionHandlers: AgentActionHandlerMap = {
 	updateAgent: async ({zipUrl, zipPath}) => {
@@ -51,22 +51,23 @@ const actionHandlers: AgentActionHandlerMap = {
 async function actionRouter(actionBody: AgentUnknownActionBody) {
 	const {uuid, action} = actionBody
 	await actionHandlers[action](actionBody as never)
-	completedActions.push(uuid)
+	completedIds.push(uuid)
 }
 
 async function checkin() {
 	try {
 		const status = await calculateStatus()
+		const requestBody: CheckinRequestBody = {status, completedIds, errors}
 		const response = await axios.post(
 			process.env.CHECKIN_POST_URL,
-			{status, completedActions, failedActions},
+			requestBody,
 			{
 				timeout: 3000,
 			},
 		)
 		const responseData: AgentUnknownActionBody[] = response.data
-		completedActions = []
-		failedActions = []
+		completedIds = []
+		errors = []
 		if (responseData.length) {
 			// eslint-disable-next-line no-console
 			console.dir(responseData)
@@ -80,7 +81,7 @@ async function checkin() {
 			} catch (e: any) {
 				// eslint-disable-next-line no-console
 				console.error(e.toString())
-				failedActions.push(actionBody.uuid)
+				errors.push(e.toString())
 			}
 		}
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

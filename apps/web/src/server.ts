@@ -1,4 +1,4 @@
-import type {Status, UnknownActionBody, UnknownRawActionBody} from 'types'
+import type {CheckinRequestBody, Status, UnknownActionBody, UnknownRawActionBody} from 'types'
 
 import http from 'http'
 import EventEmitter from 'events'
@@ -10,6 +10,7 @@ import ping from 'ping'
 import dotenv from 'dotenv'
 import express from 'express'
 import wol from 'wake_on_lan'
+import ah from 'express-async-handler'
 
 dotenv.config({path: '.env.local'})
 
@@ -53,21 +54,21 @@ io.on('connection', (socket) => {
 app.post('/checkin', (req, res) => {
 	agentOfflineTimer.refresh()
 
-	const {status, completedActions, failedActions}: {status: Status, completedActions: string[], failedActions: string[]} = req.body
+	const {status, completedIds, errors}: CheckinRequestBody = req.body
 	io.emit('status', status)
 
-	completedActions.forEach((uuid) => {
+	completedIds.forEach((uuid) => {
 		eventEmitter.emit(uuid)
 	})
-	failedActions.forEach((uuid) => {
-		eventEmitter.emit(uuid, true)
+	errors.forEach((error) => {
+		io.emit('error', error)
 	})
 
 	res.json(actions)
 	actions = []
 })
 
-app.post('/execute', async (req, res) => {
+app.post('/execute', ah(async (req, res) => {
 	const uuid = uuidv4()
 	const action = {uuid, ...req.body as UnknownRawActionBody}
 	try {
@@ -86,7 +87,7 @@ app.post('/execute', async (req, res) => {
 		res.status(500).send()
 	}
 	res.send()
-})
+}))
 
 app.use(express.static('dist/client'))
 

@@ -1,3 +1,5 @@
+import type {Status} from 'types'
+
 import os from 'os'
 
 import 'loadavg-windows'
@@ -38,7 +40,7 @@ let currentPowerPlan: string
 
 export async function calculateStatus() {
 	if (process.platform !== 'win32') {
-		return undefined
+		return undefined as unknown as Status
 	}
 
 	const cpuUsage = Math.round((os.loadavg()[0] * 100) / cores)
