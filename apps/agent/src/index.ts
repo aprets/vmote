@@ -15,8 +15,6 @@ dotenv.config({path: '.env.local'})
 
 const runOneOffPowerShell = (command: string) => PowerShell.invoke(command, {executableOptions: {'-ExecutionPolicy': 'Bypass', '-NoProfile': true}})
 
-console.log(`DEV ${process.env.DEV}`)
-
 let completedActions: string[] = []
 let failedActions: string[] = []
 
