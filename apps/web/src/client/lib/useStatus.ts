@@ -16,7 +16,6 @@ export function useStatus(): [boolean, Status] {
 		})
 
 		socket.on('status', (updatedStatus) => {
-			console.dir(updatedStatus)
 			setStatus(updatedStatus)
 		})
 

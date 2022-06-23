@@ -57,11 +57,11 @@ export type ActionBody<A extends ActionName> = {
 	uuid: string
 } & RawActionBody<A>
 
-export type UnknownRawActionBody = RawActionBody<ActionName>
+export type UnknownRawActionBody = {[k in ActionName]: RawActionBody<k>}[ActionName]
 
-export type UnknownActionBody = ActionBody<ActionName>
+export type UnknownActionBody = {[k in ActionName]: ActionBody<k>}[ActionName]
 
-export type AgentUnknownActionBody = ActionBody<AgentActionName>
+export type AgentUnknownActionBody = {[k in AgentActionName]: ActionBody<k>}[AgentActionName]
 
 export type AgentActionHandlerMap = {
 	[k in AgentActionName]: (actionBody: ActionBody<k>) => Promise<void | string>

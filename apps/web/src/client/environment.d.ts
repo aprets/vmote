@@ -1,5 +1,5 @@
 interface ImportMetaEnv {
-	readonly VITE_HOST_PARSEC_URL: string
+	readonly HOST_PARSEC_URL: string
 	// more env variables...
 }
 

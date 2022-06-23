@@ -12,7 +12,7 @@ export async function showError(text: string) {
 
 export async function sendCommand<A extends ActionName>(action: RawActionBody<A>): Promise<void> {
 	await Swal.fire({
-		title: 'Apply changes...',
+		title: 'Applying changes ⌛',
 		didOpen: () => {
 			Swal.showLoading()
 			fetch('/execute', {
