@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 export interface Status {
 	cores: number,
 	cpuUsage: number,
@@ -25,12 +26,15 @@ type VMIdentification = {
 }
 
 interface ActionsMap {
-	wakeHost: Record<string, unknown>,
-	updateAgent: Record<string, unknown>,
-	shutdownHost: Record<string, unknown>,
-	suspendHost: Record<string, unknown>,
-	restartHost: Record<string, unknown>,
-	restartHostParsec: Record<string, unknown>,
+	wakeHost: {},
+	shutdownHost: {},
+	suspendHost: {},
+	restartHost: {},
+	restartHostParsec: {},
+	updateAgent: {
+		zipUrl: string,
+		zipPath: string,
+	},
 	startVM: VMIdentification,
 	stopVM: VMIdentification,
 	setVMCPU: VMIdentification & {
@@ -43,6 +47,22 @@ interface ActionsMap {
 
 export type ActionName = keyof ActionsMap
 
-export type ActionBody<A extends ActionName> = {
+export type AgentActionName = Exclude<ActionName, 'wakeHost'>
+
+export type RawActionBody<A extends ActionName> = {
 	action: A
 } & ActionsMap[A]
+
+export type ActionBody<A extends ActionName> = {
+	uuid: string
+} & RawActionBody<A>
+
+export type UnknownRawActionBody = RawActionBody<ActionName>
+
+export type UnknownActionBody = ActionBody<ActionName>
+
+export type AgentUnknownActionBody = ActionBody<AgentActionName>
+
+export type AgentActionHandlerMap = {
+	[k in AgentActionName]: (actionBody: ActionBody<k>) => Promise<void | string>
+}
