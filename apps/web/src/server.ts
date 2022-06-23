@@ -1,4 +1,4 @@
-import type {ActionName, CheckinRequestBody, Status, UnknownActionBody, UnknownRawActionBody} from 'types'
+import type {ActionName, AgentUnknownActionBody, CheckinRequestBody, Status, UnknownActionBody, UnknownRawActionBody} from 'types'
 
 import http from 'http'
 import EventEmitter from 'events'
@@ -6,7 +6,6 @@ import path from 'path'
 
 import {Server as SocketioServer} from 'socket.io'
 import {v4 as uuidv4} from 'uuid'
-import ping from 'ping'
 import dotenv from 'dotenv'
 import express from 'express'
 import wol from 'wake_on_lan'
@@ -18,9 +17,9 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001
 
 const eventEmitter = new EventEmitter()
 
-const noResponseActions: ActionName[] = ['wakeHost', 'shutdownHost', 'suspendHost', 'restartHost', 'updateAgent']
+const agentDisconnectActions: ActionName[] = ['shutdownHost', 'suspendHost', 'restartHost', 'updateAgent']
 
-let actions: UnknownActionBody[] = []
+let actions: AgentUnknownActionBody[] = []
 
 const app = express()
 app.use(express.json())
@@ -29,35 +28,45 @@ const server = http.createServer(app)
 
 const io = new SocketioServer(server)
 
-async function wakeHost(uuid: string) {
-	console.log(`waking up host ${process.env.HOST_ADDR}`)
+let isAgentOnline = false
+
+async function wakeHost() {
 	let tries = 0
-	let alive = false
-	while (!alive && tries <= 25) {
-		console.log(`try ${tries}`)
+	while (!isAgentOnline && tries <= 60) {
 		tries += 1
 		wol.wake(process.env.HOST_MAC_ADDR)
 		// eslint-disable-next-line no-await-in-loop
-		const r = await ping.promise.probe(process.env.HOST_ADDR)
-		alive = r.alive
+		await new Promise((resolve) => { setTimeout(resolve, 1000) })
 	}
-	console.dir({uuid, alive})
-	eventEmitter.emit(uuid)
-	if (!alive) {
+	if (!isAgentOnline) {
 		io.emit('error', 'Failed to wake host')
 	}
 }
 
-const agentOfflineTimer = setTimeout(() => io.emit('agentOffline'), 3000)
+async function waitAgentOffline() {
+	let tries = 0
+	while (isAgentOnline && tries <= 60) {
+		tries += 1
+		// eslint-disable-next-line no-await-in-loop
+		await new Promise((resolve) => { setTimeout(resolve, 1000) })
+	}
+	if (isAgentOnline) {
+		io.emit('error', 'The host is still online for an unknown reason')
+	}
+}
 
-io.on('connection', (socket) => {
-	socket.on('disconnect', () => {
-		console.log('client disconnected')
-	})
-})
+const agentOfflineTimer = setTimeout(() => {
+	io.emit('agentOffline')
+	isAgentOnline = false
+}, 3000)
+
+const logAgentCheckin = () => {
+	agentOfflineTimer.refresh()
+	isAgentOnline = true
+}
 
 app.post('/checkin', (req, res) => {
-	agentOfflineTimer.refresh()
+	logAgentCheckin()
 
 	const {status, completedIds, errors}: CheckinRequestBody = req.body
 	io.emit('status', status)
@@ -77,16 +86,21 @@ app.post('/execute', ah(async (req, res) => {
 	const uuid = uuidv4()
 	const actionBody = {uuid, ...req.body as UnknownRawActionBody}
 	try {
-		if (actionBody.action !== 'wakeHost') {
+		const isAgentAction = actionBody.action !== 'wakeHost'
+		if (isAgentAction) {
 			actions.push(actionBody)
 		} else {
-			wakeHost(uuid)
+			await wakeHost()
 		}
 
-		if (!noResponseActions.includes(actionBody.action)) {
+		if (isAgentAction) {
 			await new Promise((resolve) => {
 				eventEmitter.on(uuid, resolve)
 			})
+		}
+
+		if (agentDisconnectActions.includes(actionBody.action)) {
+			await waitAgentOffline()
 		}
 	} catch {
 		res.status(500).send()
@@ -104,4 +118,6 @@ app.get('*', (_req, res) => {
 server.listen(port, () => {
 	// eslint-disable-next-line no-console
 	console.log(`> Ready on http://localhost:${port}`)
+	// eslint-disable-next-line no-console
+	console.log(`USING HOST MAC=${process.env.HOST_MAC_ADDR} VITE_HOST_PARSEC_URL=${process.env.VITE_HOST_PARSEC_URL}`)
 })
