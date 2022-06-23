@@ -32,10 +32,10 @@ async function installDependencies() {
 	const yarnInstall = await exec('yarn install', {cwd: extractLocation})
 	console.log(yarnInstall.stdout)
 	console.error(yarnInstall.stderr)
-	console.log(`Building JS in ${extractLocation}`)
-	const yarnBuild = await exec('yarn build', {cwd: extractLocation})
-	console.log(yarnBuild.stdout)
-	console.error(yarnBuild.stderr)
+	// console.log(`Building JS in ${extractLocation}`)
+	// const yarnBuild = await exec('yarn build', {cwd: extractLocation})
+	// console.log(yarnBuild.stdout)
+	// console.error(yarnBuild.stderr)
 }
 
 export async function startUpdate(zipUrl: string, zipPath: string) {
