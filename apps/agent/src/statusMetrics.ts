@@ -50,7 +50,7 @@ export async function calculateStatus() {
 	const [rawTotalVRAM, rawFreeVRAM, rawGPUUsage] = (await runPS(`${nvidiaSmiPath} --query-gpu=memory.total,memory.free,utilization.gpu --format=csv,noheader,nounits`)).split(', ')
 
 	const gpuUsage = parseInt(rawGPUUsage, 10)
-	const vramUsage = Math.round(100 - (parseInt(rawFreeVRAM, 10) / (parseInt(rawTotalVRAM, 10) * 100)))
+	const vramUsage = Math.round(100 - ((parseInt(rawFreeVRAM, 10) / parseInt(rawTotalVRAM, 10)) * 100))
 
 	const rawPsOutput = await runJPS('Get-VM | Select Name,Id,State,Uptime,CPUUsage,MemoryAssigned,MemoryDemand,ProcessorCount,MemoryStartup | sort Name | ConvertTo-Json')
 
