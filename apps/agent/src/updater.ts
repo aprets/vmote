@@ -29,7 +29,7 @@ async function extractUpdate(zipLocation: string, zipPath: string) {
 
 async function installDependencies() {
 	console.log(`Installing dependencies in ${extractLocation}`)
-	const yarnInstall = await exec('yarn install', {cwd: extractLocation})
+	const yarnInstall = await exec('yarn install --production --frozen-lockfile', {cwd: extractLocation})
 	console.log(yarnInstall.stdout)
 	console.error(yarnInstall.stderr)
 	// console.log(`Building JS in ${extractLocation}`)

@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+	  "composite": false,
+	  "esModuleInterop": true,
+	  "isolatedModules": true
+	},
+	"include": ["./src/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
+  }
+  
