@@ -10,7 +10,7 @@ RUN yarn install
 
 RUN yarn build
 
-COPY ./apps/web /app
+RUN cp -r ./apps/web /app
 
 RUN rm -rf /build
 
