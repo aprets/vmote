@@ -5,7 +5,6 @@ import {sendCommand} from '../lib/remoteExec'
 import {MetricRing, MetricText} from './metrics'
 
 export default function HostCard({status}: {status: Status}) {
-	const parsecConnectLink = import.meta.env.VITE_HOST_PARSEC_URL
 	return (
 		<>
 			<SimpleGrid cols={5} spacing='xs'>
@@ -28,11 +27,6 @@ export default function HostCard({status}: {status: Status}) {
 				<Button variant='light' color='red' onClick={() => { sendCommand({action: 'shutdownHost'}) }}>
 					Shutdown Host
 				</Button>
-				{parsecConnectLink && (
-					<Button variant='light' color='grape' component='a' href={parsecConnectLink} target='_blank'>
-						Open In Parsec
-					</Button>
-				)}
 			</Group>
 		</>
 	)
