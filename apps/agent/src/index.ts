@@ -100,5 +100,5 @@ async function statusLoop() {
 }
 
 // eslint-disable-next-line no-console
-console.log(`Starting agent calling ${process.env.CHECKIN_POST_URL}`)
+console.log(`Starting agent calling ${process.env.CHECKIN_POST_URL} at ${new Date()}`)
 statusLoop()
