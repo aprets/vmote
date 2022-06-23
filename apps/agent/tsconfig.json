@@ -11,6 +11,6 @@
   "files": [
     "src/environment.d.ts",
   ],
-  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+  "include": ["./src/**/*.ts"],
   "exclude": ["dist"]
 }

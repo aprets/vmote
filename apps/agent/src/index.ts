@@ -98,4 +98,6 @@ async function statusLoop() {
 	setTimeout(statusLoop, delay)
 }
 
+// eslint-disable-next-line no-console
+console.log(`Starting agent calling ${process.env.CHECKIN_POST_URL}`)
 statusLoop()
