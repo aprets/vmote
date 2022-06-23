@@ -8,7 +8,6 @@
     "start": "ts-node src/runner"
   },
   "dependencies": {
-    "auto-git-update": "^2.1.2",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "humanize-duration": "^3.27.1",

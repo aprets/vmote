@@ -6,7 +6,6 @@ import {performance} from 'perf_hooks'
 
 import axios from 'axios'
 
-import AutoGitUpdate from 'auto-git-update'
 import {PowerShell} from 'node-powershell'
 
 import {calculateStatus} from './statusMetrics'
@@ -16,12 +15,7 @@ dotenv.config({path: '.env.local'})
 
 const runOneOffPowerShell = (command: string) => PowerShell.invoke(command, {executableOptions: {'-ExecutionPolicy': 'Bypass', '-NoProfile': true}})
 
-// const updater = new AutoGitUpdate({
-// 	repository: process.env.GIT_REPO_URL,
-// 	branch: process.env.GIT_BRANCH,
-// 	tempLocation: '../tmp-update',
-// 	exitOnComplete: true,
-// })
+console.log(`DEV ${process.env.DEV}`)
 
 let completedActions: string[] = []
 let failedActions: string[] = []

@@ -6,7 +6,7 @@ import path from 'path'
 
 import {async as StreamZip} from 'node-stream-zip'
 
-const extractLocation = process.env.DEV ? path.join(__dirname, '..', 'dist') : path.join(__dirname, '..')
+let extractLocation: string
 
 async function downloadUpdate(updateUrl: string, tmpDir: string) {
 	const zipLocation = path.join(tmpDir, 'update.zip')
@@ -24,6 +24,7 @@ async function extractUpdate(zipLocation: string, zipPath: string) {
 }
 
 export async function startUpdate(zipUrl: string, zipPath: string) {
+	extractLocation = process.env.DEV ? path.join(__dirname, '..', 'dist') : path.join(__dirname, '..')
 	let tmpDir: string | undefined
 	const appPrefix = 'vmote-update-'
 	try {
