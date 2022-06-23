@@ -32,10 +32,6 @@ async function installDependencies() {
 	const yarnInstall = await exec('yarn install --production --frozen-lockfile', {cwd: extractLocation})
 	console.log(yarnInstall.stdout)
 	console.error(yarnInstall.stderr)
-	// console.log(`Building JS in ${extractLocation}`)
-	// const yarnBuild = await exec('yarn build', {cwd: extractLocation})
-	// console.log(yarnBuild.stdout)
-	// console.error(yarnBuild.stderr)
 }
 
 export async function startUpdate(zipUrl: string, zipPath: string) {
@@ -60,7 +56,8 @@ export async function startUpdate(zipUrl: string, zipPath: string) {
 				await fs.promises.rm(tmpDir, {recursive: true})
 			}
 			if (success) {
-				console.log('Update complete')
+				console.log('Update complete, restarting...')
+				process.exit()
 			}
 		} catch (e: any) {
 			console.error(`An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually. Error: ${e.toString}`)
