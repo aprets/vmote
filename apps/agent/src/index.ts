@@ -51,7 +51,6 @@ const actionHandlers: AgentActionHandlerMap = {
 async function actionRouter(actionBody: AgentUnknownActionBody) {
 	const {uuid, action} = actionBody
 	await actionHandlers[action](actionBody as never)
-	completedIds.push(uuid)
 }
 
 async function checkin() {
@@ -83,6 +82,7 @@ async function checkin() {
 				console.error(e.toString())
 				errors.push(e.toString())
 			}
+			completedIds.push(actionBody.uuid)
 		}
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (e: any) {
