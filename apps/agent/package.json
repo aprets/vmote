@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node-dev src/index",
+    "dev": "ts-node-dev src/",
     "build": "tsc",
-    "start": "ts-node src/runner"
+    "start": "node dist/runner"
   },
   "dependencies": {
     "axios": "^0.27.2",
@@ -13,10 +13,10 @@
     "humanize-duration": "^3.27.1",
     "loadavg-windows": "^1.1.1",
     "node-powershell": "^5.0.1",
-    "node-stream-zip": "^1.15.0",
-    "ts-node": "^10.8.1"
+    "node-stream-zip": "^1.15.0"
   },
   "devDependencies": {
+    "ts-node": "^10.8.1",
     "@types/humanize-duration": "^3.27.1",
     "@types/node": "^16.11.1",
     "config": "*",

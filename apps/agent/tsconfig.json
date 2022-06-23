@@ -10,7 +10,6 @@
   },
   "files": [
     "src/environment.d.ts",
-    "src/auto-git-update.d.ts",
   ],
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "exclude": ["dist"]

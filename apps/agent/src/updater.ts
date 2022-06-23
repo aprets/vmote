@@ -29,9 +29,13 @@ async function extractUpdate(zipLocation: string, zipPath: string) {
 
 async function installDependencies() {
 	console.log(`Installing dependencies in ${extractLocation}`)
-	const child = await exec('yarn install', {cwd: extractLocation})
-	console.log(child.stdout)
-	console.error(child.stderr)
+	const yarnInstall = await exec('yarn install', {cwd: extractLocation})
+	console.log(yarnInstall.stdout)
+	console.error(yarnInstall.stderr)
+	console.log(`Building JS in ${extractLocation}`)
+	const yarnBuild = await exec('yarn build', {cwd: extractLocation})
+	console.log(yarnBuild.stdout)
+	console.error(yarnBuild.stderr)
 }
 
 export async function startUpdate(zipUrl: string, zipPath: string) {

@@ -1,6 +1,6 @@
 import {ChildProcess, spawn, SpawnOptions} from 'child_process'
 
-const cmd = 'ts-node ./src'
+const cmd = 'node dist/'
 
 const options: SpawnOptions = {
 	shell: true,
