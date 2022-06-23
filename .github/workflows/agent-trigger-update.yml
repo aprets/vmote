@@ -1,0 +1,26 @@
+name: (Agent) Trigger Update
+
+on:
+  push:
+    branches: 
+      - main
+    paths:
+      - apps/agent/**
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: POST to VMote prod
+      run: >
+        curl -L -X POST
+        -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}"
+        -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}"
+        -H 'Content-Type: application/json'
+        -d '{"action": "updateAgent"}'
+        https://vmote.wcore.net/execute
+
