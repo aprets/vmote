@@ -86,21 +86,19 @@ app.post('/execute', ah(async (req, res) => {
 	const uuid = uuidv4()
 	const actionBody = {uuid, ...req.body as UnknownRawActionBody}
 	try {
-		const isAgentAction = actionBody.action !== 'wakeHost'
-		if (isAgentAction) {
+		const isWakeHost = actionBody.action === 'wakeHost'
+		if (!isWakeHost) {
 			actions.push(actionBody)
 		} else {
 			await wakeHost()
 		}
 
-		if (isAgentAction) {
+		if (agentDisconnectActions.includes(actionBody.action)) {
+			await waitAgentOffline()
+		} else if (!isWakeHost) {
 			await new Promise((resolve) => {
 				eventEmitter.on(uuid, resolve)
 			})
-		}
-
-		if (agentDisconnectActions.includes(actionBody.action)) {
-			await waitAgentOffline()
 		}
 	} catch {
 		res.status(500).send()
