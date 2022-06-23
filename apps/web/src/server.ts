@@ -17,7 +17,7 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001
 
 const eventEmitter = new EventEmitter()
 
-const agentDisconnectActions: ActionName[] = ['shutdownHost', 'suspendHost', 'restartHost', 'updateAgent']
+const agentDisconnectActions: ActionName[] = ['shutdownHost', 'suspendHost', 'restartHost']
 
 let actions: AgentUnknownActionBody[] = []
 
@@ -86,6 +86,7 @@ app.post('/execute', ah(async (req, res) => {
 	const uuid = uuidv4()
 	const actionBody = {uuid, ...req.body as UnknownRawActionBody}
 	try {
+		const isUpdateAgent = actionBody.action === 'updateAgent'
 		const isWakeHost = actionBody.action === 'wakeHost'
 		if (!isWakeHost) {
 			actions.push(actionBody)
@@ -95,7 +96,7 @@ app.post('/execute', ah(async (req, res) => {
 
 		if (agentDisconnectActions.includes(actionBody.action)) {
 			await waitAgentOffline()
-		} else if (!isWakeHost) {
+		} else if (!isWakeHost && !isUpdateAgent) {
 			await new Promise((resolve) => {
 				eventEmitter.on(uuid, resolve)
 			})
