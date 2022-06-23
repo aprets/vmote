@@ -44,8 +44,8 @@ export async function calculateStatus() {
 	const cpuUsage = Math.round((os.loadavg()[0] * 100) / cores)
 
 	const ramUsage = Math.round(100 - ((os.freemem() / os.totalmem()) * 100))
-	const activeRam = Math.round((os.totalmem() - os.freemem()) / (1024 ** 3 * 10)) / 10
-	const totalRam = Math.round((os.totalmem()) / (1024 ** 3 * 10)) / 10
+	const activeRam = Math.round(((os.totalmem() - os.freemem()) / (1024 ** 3)) * 10) / 10
+	const totalRam = Math.round(((os.totalmem()) / (1024 ** 3)) * 10) / 10
 
 	const [rawTotalVRAM, rawFreeVRAM, rawGPUUsage] = (await runPS(`${nvidiaSmiPath} --query-gpu=memory.total,memory.free,utilization.gpu --format=csv,noheader,nounits`)).split(', ')
 
@@ -63,10 +63,10 @@ export async function calculateStatus() {
 			cpuUsage: rawVm.cpuUsage,
 			uptime: humanizeDuration(rawVm.Uptime.TotalMilliseconds, {round: true}),
 			processorCount: rawVm.processorCount,
-			ram: Math.round(rawVm.MemoryStartup / (1024 ** 3 * 10)) / 10,
+			ram: Math.round((rawVm.MemoryStartup / (1024 ** 3)) * 10) / 10,
 			ramUsage: Math.round((rawVm.MemoryDemand / rawVm.MemoryAssigned) * 100) || 0,
-			activeRam: Math.round(rawVm.MemoryDemand / (1024 ** 3 * 10)) / 10,
-			totalRam: Math.round(rawVm.MemoryAssigned / (1024 ** 3 * 10)) / 10,
+			activeRam: Math.round((rawVm.MemoryDemand / (1024 ** 3)) * 10) / 10,
+			totalRam: Math.round((rawVm.MemoryAssigned / (1024 ** 3)) * 10) / 10,
 
 		}),
 	)
