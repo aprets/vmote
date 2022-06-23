@@ -62,7 +62,7 @@ export async function calculateStatus() {
 			name: rawVm.Name,
 			id: rawVm.Id,
 			state: hypervVMStates[rawVm.State - 1],
-			cpuUsage: rawVm.CpuUsage,
+			cpuUsage: rawVm.CPUUsage,
 			uptime: humanizeDuration(rawVm.Uptime.TotalMilliseconds, {round: true}),
 			processorCount: rawVm.ProcessorCount,
 			ram: Math.round((rawVm.MemoryStartup / (1024 ** 3)) * 10) / 10,
