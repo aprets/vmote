@@ -117,5 +117,5 @@ server.listen(port, () => {
 	// eslint-disable-next-line no-console
 	console.log(`> Ready on http://localhost:${port}`)
 	// eslint-disable-next-line no-console
-	console.log(`USING HOST MAC=${process.env.HOST_MAC_ADDR} VITE_HOST_PARSEC_URL=${process.env.VITE_HOST_PARSEC_URL}`)
+	console.log(`USING HOST MAC=${process.env.HOST_MAC_ADDR}`)
 })
