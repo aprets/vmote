@@ -1,3 +1,5 @@
+import type {ActionName, ActionBody, AgentActionHandlerMap, UnknownActionBody, AgentUnknownActionBody, AgentActionName} from 'types'
+
 import dotenv from 'dotenv'
 
 import {performance} from 'perf_hooks'
@@ -8,6 +10,7 @@ import AutoGitUpdate from 'auto-git-update'
 import {PowerShell} from 'node-powershell'
 
 import {calculateStatus} from './statusMetrics'
+import {startUpdate} from './updater'
 
 dotenv.config({path: '.env.local'})
 
@@ -23,9 +26,9 @@ const runOneOffPowerShell = (command: string) => PowerShell.invoke(command, {exe
 let completedActions: string[] = []
 let failedActions: string[] = []
 
-const actionHandlers = {
-	updateAgent: async () => {
-		// updater.forceUpdate()
+const actionHandlers: AgentActionHandlerMap = {
+	updateAgent: async ({zipUrl, zipPath}) => {
+		startUpdate(zipUrl, zipPath)
 	},
 	shutdownHost: async () => {
 		runOneOffPowerShell('Stop-Computer -Force')
@@ -39,23 +42,23 @@ const actionHandlers = {
 	restartHostParsec: async () => {
 		await runOneOffPowerShell('sc.exe control Parsec 200 ; Stop-Process -Name parsecd -Force ; Restart-Service -Name Parsec -Force')
 	},
-	startVM: async ({vmName}: {vmName: string}) => {
+	startVM: async ({vmName}) => {
 		await runOneOffPowerShell(`Start-VM -Name "${vmName}"`)
 	},
-	stopVM: async ({vmName}: {vmName: string}) => {
+	stopVM: async ({vmName}) => {
 		await runOneOffPowerShell(`Stop-VM -Name "${vmName}" -Force`)
 	},
-	setVMCPU: async ({vmName, value}: {vmName: string, value: number}) => {
+	setVMCPU: async ({vmName, value}) => {
 		await runOneOffPowerShell(`Set-VMProcessor "${vmName}" -Count ${value}`)
 	},
-	setVMRAM: async ({vmName, value}: {vmName: string, value: number}) => {
+	setVMRAM: async ({vmName, value}) => {
 		await runOneOffPowerShell(`Set-VMMemory "${vmName}" -StartupBytes ${value}GB -AlignProperties`)
 	},
 }
 
-async function actionRouter(actionBody: any) {
+async function actionRouter(actionBody: AgentUnknownActionBody) {
 	const {uuid, action} = actionBody
-	await actionHandlers[action as keyof typeof actionHandlers](actionBody)
+	await actionHandlers[action](actionBody as never)
 	completedActions.push(uuid)
 }
 
