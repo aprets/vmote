@@ -1,9 +1,8 @@
-import type {ActionBody, ActionName, Status} from 'types'
+import type {Status, UnknownActionBody, UnknownRawActionBody} from 'types'
 
 import http from 'http'
 import EventEmitter from 'events'
 import path from 'path'
-import dns from 'dns'
 
 import {Server as SocketioServer} from 'socket.io'
 import {v4 as uuidv4} from 'uuid'
@@ -15,13 +14,10 @@ import wol from 'wake_on_lan'
 dotenv.config({path: '.env.local'})
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001
-const isDev = process.env.NODE_ENV !== 'production'
 
 const eventEmitter = new EventEmitter()
 
-type UniqueAction = (ActionBody<ActionName> & {uuid: string})
-
-let actions: UniqueAction[] = []
+let actions: UnknownActionBody[] = []
 
 async function wakeHost(uuid: string) {
 	console.log(`waking up host ${process.env.HOST_ADDR}`)
@@ -73,7 +69,7 @@ app.post('/checkin', (req, res) => {
 
 app.post('/execute', async (req, res) => {
 	const uuid = uuidv4()
-	const action = {uuid, ...req.body}
+	const action = {uuid, ...req.body as UnknownRawActionBody}
 	try {
 		if (action.action !== 'wakeHost') {
 			actions.push(action)
