@@ -6,9 +6,11 @@ WORKDIR /app
 
 COPY . .
 
-RUN yarn install --production --frozen-lockfile
+RUN yarn install
 
 RUN yarn build
+
+RUN yarn install --production --frozen-lockfile
 
 RUN rm -rf src
 
