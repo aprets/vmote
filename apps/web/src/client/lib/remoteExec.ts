@@ -3,7 +3,7 @@ import type {ActionBody, ActionName} from 'types'
 import 'sweetalert2/dist/sweetalert2.css'
 import Swal from 'sweetalert2'
 
-async function showError(text: string) {
+export async function showError(text: string) {
 	await Swal.fire({
 		text,
 		icon: 'error',

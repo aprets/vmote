@@ -20,6 +20,13 @@ const eventEmitter = new EventEmitter()
 
 let actions: UnknownActionBody[] = []
 
+const app = express()
+app.use(express.json())
+
+const server = http.createServer(app)
+
+const io = new SocketioServer(server)
+
 async function wakeHost(uuid: string) {
 	console.log(`waking up host ${process.env.HOST_ADDR}`)
 	let tries = 0
@@ -33,15 +40,12 @@ async function wakeHost(uuid: string) {
 		alive = r.alive
 	}
 	console.dir({uuid, alive})
-	eventEmitter.emit(uuid, !alive)
+	eventEmitter.emit(uuid)
+	if (!alive) {
+		io.emit('error', 'Failed to wake host')
+	}
 }
 
-const app = express()
-app.use(express.json())
-
-const server = http.createServer(app)
-
-const io = new SocketioServer(server)
 const agentOfflineTimer = setTimeout(() => io.emit('agentOffline'), 3000)
 
 io.on('connection', (socket) => {
@@ -77,10 +81,8 @@ app.post('/execute', ah(async (req, res) => {
 			wakeHost(uuid)
 		}
 
-		await new Promise((resolve, reject) => {
-			eventEmitter.on(uuid, (didError) => {
-				if (didError) { reject() } else { resolve(undefined) }
-			})
+		await new Promise((resolve) => {
+			eventEmitter.on(uuid, resolve)
 		})
 	} catch {
 		res.status(500).send()

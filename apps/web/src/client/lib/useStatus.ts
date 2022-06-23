@@ -2,6 +2,7 @@ import type {Status} from 'types'
 import {useEffect, useState} from 'react'
 
 import {io} from 'socket.io-client'
+import { showError } from './remoteExec'
 
 export function useStatus(): [boolean, Status] {
 	const [connected, setConnected] = useState(false)
@@ -17,6 +18,10 @@ export function useStatus(): [boolean, Status] {
 		socket.on('status', (updatedStatus) => {
 			console.dir(updatedStatus)
 			setStatus(updatedStatus)
+		})
+
+		socket.on('error', (error) => {
+			showError(error)
 		})
 
 		socket.on('disconnect', () => {
