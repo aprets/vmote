@@ -20,16 +20,16 @@ let failedActions: string[] = []
 
 const actionHandlers: AgentActionHandlerMap = {
 	updateAgent: async ({zipUrl, zipPath}) => {
-		startUpdate(zipUrl, zipPath)
+		await startUpdate(zipUrl, zipPath)
 	},
 	shutdownHost: async () => {
-		runOneOffPowerShell('Stop-Computer -Force')
+		await runOneOffPowerShell('Stop-Computer -Force')
 	},
 	suspendHost: async () => {
-		runOneOffPowerShell('rundll32.exe powrprof.dll,SetSuspendState 0,1,0')
+		await runOneOffPowerShell('rundll32.exe powrprof.dll,SetSuspendState 0,1,0')
 	},
 	restartHost: async () => {
-		runOneOffPowerShell('Restart-Computer -Force')
+		await runOneOffPowerShell('Restart-Computer -Force')
 	},
 	restartHostParsec: async () => {
 		await runOneOffPowerShell('sc.exe control Parsec 200 ; Stop-Process -Name parsecd -Force ; Restart-Service -Name Parsec -Force')
