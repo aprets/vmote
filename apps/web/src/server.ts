@@ -42,8 +42,7 @@ app.use(express.json())
 const server = http.createServer(app)
 
 const io = new SocketioServer(server)
-const agentTimeout = () => io.emit('agentOffline')
-const agentOfflineTimer = setTimeout(agentTimeout, 3000)
+const agentOfflineTimer = setTimeout(() => io.emit('agentOffline'), 3000)
 
 io.on('connection', (socket) => {
 	socket.on('disconnect', () => {
