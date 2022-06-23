@@ -1,4 +1,4 @@
-import type {ActionName, ActionBody, AgentActionHandlerMap, UnknownActionBody, AgentUnknownActionBody, AgentActionName} from 'types'
+import type {AgentActionHandlerMap, AgentUnknownActionBody} from 'types'
 
 import dotenv from 'dotenv'
 
@@ -64,11 +64,15 @@ async function checkin() {
 				timeout: 3000,
 			},
 		)
+		const responseData: AgentUnknownActionBody[] = response.data
 		completedActions = []
 		failedActions = []
-		console.log(response.data)
+		if (responseData.length) {
+			// eslint-disable-next-line no-console
+			console.dir(responseData)
+		}
 		// eslint-disable-next-line no-restricted-syntax
-		for (const actionBody of response.data) {
+		for (const actionBody of responseData) {
 			try {
 				// eslint-disable-next-line no-await-in-loop
 				await actionRouter(actionBody)
