@@ -9,7 +9,6 @@ import {sendCommand} from './lib/remoteExec'
 
 export default function Dashboard(): React.ReactElement {
 	const [loading, status] = useStatus()
-	const connected = !loading
 
 	return (
 		<>
@@ -28,18 +27,19 @@ export default function Dashboard(): React.ReactElement {
 				>
 					<Text weight={500} size='xl' mb={10}>
 						Host (
-						{connected && status && <Text inherit color='green' component='span'>Running</Text>}
-						{(!connected || !status) && <Text inherit color='red' component='span'>Offline</Text>}
+						{status
+							?	<Text inherit color='green' component='span'>Running</Text>
+							:	<Text inherit color='red' component='span'>Offline</Text>}
 						)
 					</Text>
 
 					{status && <HostCard status={status} />}
 
-					{connected && !status && (
+					{loading && (
 						<Skeleton height={200} />
 					)}
 
-					{(!connected || !status) && (
+					{(!loading && !status) && (
 						<Group direction='column' align='center'>
 							<ActionIcon
 								size={100}
@@ -53,7 +53,7 @@ export default function Dashboard(): React.ReactElement {
 
 				</Card>
 
-				{connected && !status && (
+				{loading && (
 					<Skeleton height='100vh' mt={10} />
 				)}
 

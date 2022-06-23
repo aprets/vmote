@@ -1,4 +1,4 @@
-import type {ActionBody, ActionName} from 'types'
+import type {ActionBody, ActionName, RawActionBody} from 'types'
 
 import 'sweetalert2/dist/sweetalert2.css'
 import Swal from 'sweetalert2'
@@ -10,7 +10,7 @@ export async function showError(text: string) {
 	})
 }
 
-export async function sendCommand<A extends ActionName>(action: ActionBody<A>): Promise<void> {
+export async function sendCommand<A extends ActionName>(action: RawActionBody<A>): Promise<void> {
 	await Swal.fire({
 		title: 'Apply changes...',
 		didOpen: () => {

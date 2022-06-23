@@ -1,4 +1,4 @@
-import type {CheckinRequestBody, Status, UnknownActionBody, UnknownRawActionBody} from 'types'
+import type {ActionName, CheckinRequestBody, Status, UnknownActionBody, UnknownRawActionBody} from 'types'
 
 import http from 'http'
 import EventEmitter from 'events'
@@ -17,6 +17,8 @@ dotenv.config({path: '.env.local'})
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001
 
 const eventEmitter = new EventEmitter()
+
+const noResponseActions: ActionName[] = ['wakeHost', 'shutdownHost', 'suspendHost', 'restartHost', 'updateAgent']
 
 let actions: UnknownActionBody[] = []
 
@@ -73,17 +75,19 @@ app.post('/checkin', (req, res) => {
 
 app.post('/execute', ah(async (req, res) => {
 	const uuid = uuidv4()
-	const action = {uuid, ...req.body as UnknownRawActionBody}
+	const actionBody = {uuid, ...req.body as UnknownRawActionBody}
 	try {
-		if (action.action !== 'wakeHost') {
-			actions.push(action)
+		if (actionBody.action !== 'wakeHost') {
+			actions.push(actionBody)
 		} else {
 			wakeHost(uuid)
 		}
 
-		await new Promise((resolve) => {
-			eventEmitter.on(uuid, resolve)
-		})
+		if (!noResponseActions.includes(actionBody.action)) {
+			await new Promise((resolve) => {
+				eventEmitter.on(uuid, resolve)
+			})
+		}
 	} catch {
 		res.status(500).send()
 	}
