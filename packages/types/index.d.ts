@@ -26,14 +26,17 @@ type VMIdentification = {
 }
 
 interface ActionsMap {
+	updateAgent: {
+		zipUrl: string,
+		zipPath: string,
+	},
 	wakeHost: {},
 	shutdownHost: {},
 	suspendHost: {},
 	restartHost: {},
 	restartHostParsec: {},
-	updateAgent: {
-		zipUrl: string,
-		zipPath: string,
+	switchHostDisplay: {
+		mode: 'internal' | 'external' | 'clone',
 	},
 	startVM: VMIdentification,
 	stopVM: VMIdentification,
