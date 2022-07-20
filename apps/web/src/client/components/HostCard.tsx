@@ -1,10 +1,12 @@
 import type {Status} from 'types'
 
-import {SimpleGrid, Group, Button} from '@mantine/core'
+import {SimpleGrid, Group, Button, Select} from '@mantine/core'
+import {useState} from 'react'
 import {sendCommand} from '../lib/remoteExec'
 import {MetricRing, MetricText} from './metrics'
 
 export default function HostCard({status}: {status: Status}) {
+	const [switchScreenInput, setSwitchScreenInout] = useState<'internal' | 'external' | 'clone' | ''>('')
 	return (
 		<>
 			<SimpleGrid cols={5} spacing='xs'>
@@ -27,6 +29,18 @@ export default function HostCard({status}: {status: Status}) {
 				<Button variant='light' color='red' onClick={() => { sendCommand({action: 'shutdownHost'}) }}>
 					Shutdown Host
 				</Button>
+				<Select
+					placeholder='Switch Active Screen'
+					data={[
+						{value: 'internal', label: 'Show on Internal (First)'},
+						{value: 'external', label: 'Show on External (Second)'},
+						{value: 'clone', label: 'Clone Screens'},
+					]}
+					value={switchScreenInput}
+					onChange={(mode: 'internal' | 'external' | 'clone') => {
+						sendCommand({action: 'switchHostDisplay', mode})
+					}}
+				/>
 			</Group>
 		</>
 	)
