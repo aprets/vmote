@@ -35,13 +35,7 @@ const actionHandlers: AgentActionHandlerMap = {
 		await runOneOffPowerShell('sc.exe control Parsec 200 ; Stop-Process -Name parsecd -Force ; Restart-Service -Name Parsec -Force')
 	},
 	switchHostDisplay: async ({mode}) => {
-		if (mode === 'internal') {
-			await runOneOffPowerShell('DisplaySwitch.exe /internal')
-		} else if (mode === 'external') {
-			await runOneOffPowerShell('DisplaySwitch.exe /external')
-		} else {
-			await runOneOffPowerShell('DisplaySwitch.exe /clone')
-		}
+		await runOneOffPowerShell(`DisplaySwitch.exe /${mode}`)
 	},
 	startVM: async ({vmName}) => {
 		await runOneOffPowerShell(`Start-VM -Name "${vmName}"`)
