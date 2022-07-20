@@ -77,10 +77,6 @@ module.exports = {
         delimiter: 'comma',
         requireLast: true,
       },
-      singleline: {
-        delimiter: 'comma',
-        requireLast: true,
-      },
     }]
   },
   overrides: [
