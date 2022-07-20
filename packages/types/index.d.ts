@@ -18,11 +18,11 @@ export interface Status {
 		ramUsage: number,
 		activeRam: number,
 		totalRam: number,
-	}[]
+	}[],
 }
 
 type VMIdentification = {
-	vmName: string
+	vmName: string,
 }
 
 interface ActionsMap {
@@ -38,10 +38,10 @@ interface ActionsMap {
 	startVM: VMIdentification,
 	stopVM: VMIdentification,
 	setVMCPU: VMIdentification & {
-		value: number
+		value: number,
 	},
 	setVMRAM: VMIdentification & {
-		value: number
+		value: number,
 	},
 }
 
@@ -50,11 +50,11 @@ export type ActionName = keyof ActionsMap
 export type AgentActionName = Exclude<ActionName, 'wakeHost'>
 
 export type RawActionBody<A extends ActionName> = {
-	action: A
+	action: A,
 } & ActionsMap[A]
 
 export type ActionBody<A extends ActionName> = {
-	uuid: string
+	uuid: string,
 } & RawActionBody<A>
 
 export type UnknownRawActionBody = {[k in ActionName]: RawActionBody<k>}[ActionName]
@@ -70,5 +70,5 @@ export type AgentActionHandlerMap = {
 export interface CheckinRequestBody {
 	status: Status,
 	completedIds: string[],
-	errors: string[]
+	errors: string[],
 }
