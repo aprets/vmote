@@ -49,6 +49,6 @@
     "tsconfig": "*",
     "types": "*",
     "typescript": "^4.7.4",
-    "vite": "^2.9.9"
+    "vite": "^2.9.16"
   }
 }
